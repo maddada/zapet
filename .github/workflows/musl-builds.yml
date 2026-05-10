@@ -77,7 +77,7 @@ jobs:
           ls -la "${ARCHIVE_NAME}.tar.gz"*
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: artifacts-musl-${{ matrix.target }}
           path: |

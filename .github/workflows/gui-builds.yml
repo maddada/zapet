@@ -201,7 +201,7 @@ jobs:
       # ── Upload artifacts ─────────────────────────────────────────────
       - name: Upload GUI artifacts (Windows)
         if: runner.os == 'Windows'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: artifacts-gui-${{ matrix.target }}
           path: |
@@ -210,7 +210,7 @@ jobs:
 
       - name: Upload GUI artifacts (macOS)
         if: runner.os == 'macOS'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: artifacts-gui-${{ matrix.target }}
           path: |
@@ -221,7 +221,7 @@ jobs:
       # can lipo the two arches into a single fat binary.
       - name: Upload raw macOS binary (for universal lipo)
         if: runner.os == 'macOS'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: macos-binary-${{ matrix.target }}
           path: target/${{ matrix.target }}/release/fresh
@@ -229,7 +229,7 @@ jobs:
 
       - name: Upload GUI artifacts (Linux)
         if: contains(matrix.target, 'linux')
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: artifacts-gui-${{ matrix.target }}
           path: |
@@ -297,7 +297,7 @@ jobs:
           shasum -a 256 "${PKG_NAME}" > "${PKG_NAME}.sha256"
 
       - name: Upload universal .pkg
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: artifacts-gui-macos-universal
           path: |
