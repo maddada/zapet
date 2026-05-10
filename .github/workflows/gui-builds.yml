@@ -254,12 +254,12 @@ jobs:
           submodules: recursive
 
       - name: Download x86_64 binary
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: macos-binary-x86_64-apple-darwin
           path: artifacts/x86_64
       - name: Download aarch64 binary
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: macos-binary-aarch64-apple-darwin
           path: artifacts/aarch64
