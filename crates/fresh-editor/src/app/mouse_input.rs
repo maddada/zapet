@@ -1372,8 +1372,9 @@ impl Editor {
             col,
             row
         );
+        let split_areas = self.cached_layout.split_areas.clone();
         for (split_id, buffer_id, content_rect, _scrollbar_rect, _thumb_start, _thumb_end) in
-            &self.cached_layout.split_areas
+            split_areas
         {
             tracing::debug!(
                 "  split_id={:?}, content_rect=({}, {}, {}x{})",
@@ -1383,17 +1384,21 @@ impl Editor {
                 content_rect.width,
                 content_rect.height
             );
-            if in_rect(col, row, *content_rect) {
+            if in_rect(col, row, content_rect) {
+                if super::clickable_paths::has_open_path_modifier(modifiers)
+                    && self.open_click_target_at_screen_position(
+                        col,
+                        row,
+                        split_id,
+                        buffer_id,
+                        content_rect,
+                    )?
+                {
+                    return Ok(());
+                }
                 // Click in editor - focus split and position cursor
                 tracing::debug!("  -> HIT! calling handle_editor_click");
-                self.handle_editor_click(
-                    col,
-                    row,
-                    *split_id,
-                    *buffer_id,
-                    *content_rect,
-                    modifiers,
-                )?;
+                self.handle_editor_click(col, row, split_id, buffer_id, content_rect, modifiers)?;
                 return Ok(());
             }
         }

@@ -532,11 +532,13 @@ fn test_toggle_menu_bar_persists_to_global_config() {
     // action (same code path used by the View menu and the "Toggle Menu Bar"
     // command-palette entry).
     {
+        let mut config = Config::default();
+        config.editor.show_menu_bar = true;
         let mut harness = EditorTestHarness::create(
             80,
             24,
             HarnessOptions::new()
-                .with_config(Config::default())
+                .with_config(config)
                 .with_working_dir(project_dir.clone())
                 .with_shared_dir_context(dir_context.clone())
                 .without_empty_plugins_dir(),
@@ -544,7 +546,7 @@ fn test_toggle_menu_bar_persists_to_global_config() {
         .unwrap();
         harness.render().unwrap();
 
-        // Sanity: the global default is "show menu bar" = true.
+        // Sanity: this test opts into the historical visible menu bar state.
         assert!(harness.editor().config().editor.show_menu_bar);
 
         harness.editor_mut().toggle_menu_bar();

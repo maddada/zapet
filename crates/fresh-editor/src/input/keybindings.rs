@@ -16,13 +16,28 @@ use std::sync::atomic::{AtomicBool, Ordering};
 ///   In both cases, lowercase the character and preserve the existing
 ///   modifiers. This ensures CapsLock+Ctrl+A matches the `Ctrl+A` binding,
 ///   while Shift+P still matches the `Shift+P` binding.
-/// - In this single-file fork, Command/Super is treated as Control so macOS
-///   `Cmd+A`, `Cmd+S`, etc. use the same bindings as `Ctrl+A`, `Ctrl+S`.
+/// - macOS Command/Super is treated as Control so terminal hosts that forward
+///   Command chords can use the same editor bindings as Ctrl chords.
+/// - macOS Option+Arrow often arrives from terminals as Alt+F/Alt+B. Normalize
+///   those escape forms to the Ctrl+Arrow bindings before global menu mnemonics
+///   can interpret Alt+F as "File".
 fn normalize_key(code: KeyCode, modifiers: KeyModifiers) -> (KeyCode, KeyModifiers) {
     let mut modifiers = modifiers;
     if modifiers.contains(KeyModifiers::SUPER) {
         modifiers.remove(KeyModifiers::SUPER);
         modifiers.insert(KeyModifiers::CONTROL);
+    }
+
+    if modifiers == KeyModifiers::ALT {
+        match code {
+            KeyCode::Char('f') | KeyCode::Char('F') | KeyCode::Right => {
+                return (KeyCode::Right, KeyModifiers::CONTROL);
+            }
+            KeyCode::Char('b') | KeyCode::Char('B') | KeyCode::Left => {
+                return (KeyCode::Left, KeyModifiers::CONTROL);
+            }
+            _ => {}
+        }
     }
 
     if code == KeyCode::BackTab {
@@ -3174,6 +3189,34 @@ mod tests {
         assert_eq!(
             resolver.resolve(&super_a, KeyContext::Normal),
             Action::SelectAll
+        );
+    }
+
+    #[test]
+    fn test_option_arrow_escape_forms_resolve_as_control_arrow() {
+        let config = Config::default();
+        let resolver = KeybindingResolver::new(&config);
+
+        let alt_f = KeyEvent::new(KeyCode::Char('f'), KeyModifiers::ALT);
+        let alt_right = KeyEvent::new(KeyCode::Right, KeyModifiers::ALT);
+        let alt_b = KeyEvent::new(KeyCode::Char('b'), KeyModifiers::ALT);
+        let alt_left = KeyEvent::new(KeyCode::Left, KeyModifiers::ALT);
+
+        assert_eq!(
+            resolver.resolve(&alt_f, KeyContext::Normal),
+            Action::MoveWordEnd
+        );
+        assert_eq!(
+            resolver.resolve(&alt_right, KeyContext::Normal),
+            Action::MoveWordEnd
+        );
+        assert_eq!(
+            resolver.resolve(&alt_b, KeyContext::Normal),
+            Action::MoveWordLeft
+        );
+        assert_eq!(
+            resolver.resolve(&alt_left, KeyContext::Normal),
+            Action::MoveWordLeft
         );
     }
 

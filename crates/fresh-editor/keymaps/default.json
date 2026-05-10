@@ -220,6 +220,13 @@
       "when": "normal"
     },
     {
+      "key": "Enter",
+      "modifiers": ["shift"],
+      "action": "insert_newline",
+      "args": {},
+      "when": "normal"
+    },
+    {
       "key": "Tab",
       "modifiers": [],
       "action": "insert_tab",

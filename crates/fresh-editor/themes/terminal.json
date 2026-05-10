@@ -75,7 +75,7 @@
     "scrollbar_thumb_hover_fg": "White",
     "compose_margin_bg": "Default",
     "semantic_highlight_bg": "Default",
-    "semantic_highlight_modifier": ["bold", "underlined"],
+    "semantic_highlight_modifier": ["bold"],
     "terminal_bg": "Default",
     "terminal_fg": "Default",
     "status_warning_indicator_bg": "Yellow",

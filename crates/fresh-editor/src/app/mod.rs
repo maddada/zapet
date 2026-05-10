@@ -12,6 +12,7 @@ mod calibration_actions;
 pub mod calibration_wizard;
 mod click_geometry;
 mod click_handlers;
+mod clickable_paths;
 mod clipboard;
 mod composite_buffer_actions;
 mod conductor_persistence;
@@ -1593,6 +1594,29 @@ mod tests {
     }
 
     #[test]
+    fn test_command_v_pastes_via_control_alias() {
+        let config = Config::default();
+        let (dir_context, _temp) = test_dir_context();
+        let mut editor = Editor::new(
+            config,
+            80,
+            24,
+            dir_context,
+            crate::view::color_support::ColorCapability::TrueColor,
+            test_filesystem(),
+        )
+        .unwrap();
+        editor.set_clipboard_for_test("clipboard text".to_string());
+
+        editor
+            .handle_key(KeyCode::Char('v'), KeyModifiers::SUPER)
+            .unwrap();
+
+        let content = editor.active_state().buffer.to_string().unwrap();
+        assert_eq!(content, "clipboard text");
+    }
+
+    #[test]
     fn test_action_to_events_insert_char() {
         let config = Config::default();
         let (dir_context, _temp) = test_dir_context();
@@ -2760,6 +2784,16 @@ mod tests {
         };
         let action = resolver.resolve(&event, KeyContext::Normal);
         assert_eq!(action, Action::DedentSelection);
+
+        // Test Shift+Enter inserts a newline just like Enter.
+        let event = KeyEvent {
+            code: KeyCode::Enter,
+            modifiers: KeyModifiers::SHIFT,
+            kind: KeyEventKind::Press,
+            state: KeyEventState::NONE,
+        };
+        let action = resolver.resolve(&event, KeyContext::Normal);
+        assert_eq!(action, Action::InsertNewline);
 
         // Test Ctrl+G saves the active file and exits in the single-file fork.
         let event = KeyEvent {
